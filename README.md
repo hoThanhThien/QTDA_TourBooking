@@ -1,6 +1,25 @@
 clone về và dùng "composer install" để cài các thử viện cần thiết
 
 
+nếu chưa có  clone project Laravel về
+ cần làm những bước sau:
+
+1. Cài Composer
+Nếu chưa có, tải tại: https://getcomposer.org/download
+
+2. Cài các thư viện bằng Composer
+composer install
+Lệnh này sẽ:
+
+Đọc file composer.lock để cài đúng phiên bản thư viện đã dùng
+
+Tự động tạo lại thư mục vendor/
+
+3. (Tùy chọn) Nếu chạy Laravel lần đầu
+cp .env.example .env     # Tạo file môi trường
+php artisan key:generate # Tạo APP_KEY
+php artisan migrate      # Nếu có database
+php artisan serve        # Chạy server dev
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
