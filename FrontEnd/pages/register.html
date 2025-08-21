@@ -1,45 +1,110 @@
-<!doctype html>
-<html lang="vi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Register</title>
-<link rel="stylesheet" href="../assets/styles.css">
-<script src="../js/config.js"></script>
-<script src="../js/api.js"></script>
-<script src="../js/util.js"></script>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Đăng ký - Tourest VN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
-<body onload="updateNavAuth(); setBaseUrlHint()">
-<header><div>TourBooking FE</div><nav>
-<a href="../index.html">Home</a>
-<a href="../pages/tours.html">Tours</a>
-<a href="../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
-<a href="../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
-<a href="../pages/login.html" class="nav-login">Login</a>
-<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
-</nav></header>
-<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+<body>
 
-<div class="card">
-  <h3>Đăng ký</h3>
-  <div class="row">
-    <input id="username" class="input" placeholder="Username">
-    <input id="email" class="input" placeholder="Email">
-    <input id="phone" class="input" placeholder="Số điện thoại">
-    <input id="password" type="password" class="input" placeholder="Mật khẩu">
-    <button class="btn" onclick="doRegister()">Register</button>
-    <a class="btn secondary" href="./login.html">Login</a>
-  </div>
-  <div id="msg"></div>
-</div>
-<script>
-async function doRegister(){
-  const username = document.getElementById('username').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const password = document.getElementById('password').value;
-  try{
-    await api('/auth/register',{ method:'POST', body:{username,email,phone,password} });
-    document.getElementById('msg').innerHTML = '<span class="success">Đăng ký thành công, vui lòng đăng nhập.</span>';
-  }catch(e){ document.getElementById('msg').innerHTML = '<span class="error">'+e.message+'</span>'; }
-}
-</script>
-</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>
+  <header class="header" data-header>
+    <div class="container">
+      <a href="../index.html"><h1 class="logo">Tourest VN</h1></a>
+      <nav class="navbar">
+        <ul class="navbar-list">
+          <li><a href="../index.html" class="navbar-link">Trang chủ</a></li>
+          <li><a href="../pages/tours.html" class="navbar-link">Tour</a></li>
+          <li><a href="../pages/my-bookings.html" class="navbar-link">Đơn của tôi</a></li>
+          <li><a href="../pages/admin/dashboard.html" class="navbar-link">Admin</a></li>
+        </ul>
+        <a href="./login.html" class="btn btn-secondary">Đăng nhập</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container auth-wrap">
+      <div class="auth-card">
+        <h2 class="auth-title">Tạo tài khoản</h2>
+        <p class="muted">Đăng ký để đặt tour nhanh, quản lý đơn và thanh toán SePay.</p>
+
+        <form id="registerForm" novalidate>
+          <div class="form-row">
+            <label for="username" class="muted">Tên hiển thị</label>
+            <input id="username" type="text" class="input" placeholder="Ví dụ: Tran Minh" autocomplete="name" required>
+          </div>
+
+          <div class="grid">
+            <div class="form-row">
+              <label for="email" class="muted">Email</label>
+              <input id="email" type="email" class="input" placeholder="vd: user@example.com" autocomplete="email" required>
+              <div class="hint">Dùng email thật để nhận xác nhận đơn & hoá đơn.</div>
+            </div>
+
+            <div class="form-row">
+              <label for="phone" class="muted">Số điện thoại</label>
+              <input id="phone" type="tel" class="input" placeholder="vd: 0912345678" autocomplete="tel" required>
+              <div class="hint">Số Việt Nam, bắt đầu bằng 0 (10 số).</div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="form-row relative">
+              <label for="password" class="muted">Mật khẩu</label>
+              <input id="password" type="password" class="input" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" required>
+              <button id="togglePass" class="toggle-pass" type="button" aria-label="Hiện/ẩn mật khẩu">
+                <ion-icon name="eye-outline"></ion-icon>
+              </button>
+            </div>
+
+            <div class="form-row relative">
+              <label for="confirm" class="muted">Nhập lại mật khẩu</label>
+              <input id="confirm" type="password" class="input" placeholder="Nhập lại giống trên" autocomplete="new-password" required>
+              <button id="toggleConfirm" class="toggle-pass" type="button" aria-label="Hiện/ẩn mật khẩu">
+                <ion-icon name="eye-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="row" style="margin:8px 0 16px">
+            <label class="muted">
+              <input id="agree" type="checkbox"> Tôi đồng ý với
+              <a href="#" onclick="alert('Điều khoản mẫu');return false;">Điều khoản</a> &
+              <a href="#" onclick="alert('Chính sách mẫu');return false;">Chính sách</a>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <button id="btnRegister" class="btn" type="submit">
+              <ion-icon name="person-add-outline"></ion-icon> Đăng ký
+            </button>
+            <span id="msg"></span>
+          </div>
+        </form>
+
+        <div class="muted">Đã có tài khoản? <a href="./login.html">Đăng nhập</a></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer" style="background-image:url('../assets/images/footer-bg.png')">
+    <div class="container">
+      <div class="footer-bottom">
+        <a href="../index.html" class="logo">Tourest VN</a>
+        <p class="copyright">© 2025 Tourest Việt Nam</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/auth-register.js"></script>
+
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

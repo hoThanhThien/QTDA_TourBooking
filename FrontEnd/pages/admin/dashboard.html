@@ -1,33 +1,165 @@
 <!doctype html>
-<html lang="vi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Dashboard</title>
-<link rel="stylesheet" href="../../assets/styles.css">
-<script src="../../js/config.js"></script>
-<script src="../../js/api.js"></script>
-<script src="../../js/util.js"></script>
-</head>
-<body onload="updateNavAuth(); setBaseUrlHint()">
-<header><div>TourBooking FE</div><nav>
-<a href="../../index.html">Home</a>
-<a href="../../pages/tours.html">Tours</a>
-<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
-<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
-<a href="../../pages/login.html" class="nav-login">Login</a>
-<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
-</nav></header>
-<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard • TourBooking</title>
 
-<script>guardAdmin();</script>
-<div class="card">
-  <h3>Admin</h3>
-  <div class="row">
-    <a class="btn" href="./categories.html">Categories</a>
-    <a class="btn" href="./tours.html">Tours</a>
-    <a class="btn" href="./photos.html">Photos</a>
-    <a class="btn" href="./discounts.html">Discounts</a>
-    <a class="btn" href="./bookings.html">Bookings</a>
-    <a class="btn" href="./users.html">Users & Roles</a>
+  <!-- Base styles + Admin styles -->
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/admin.css" />
+
+  <!-- Config & core helpers -->
+  <script src="../../js/config.js"></script>
+  <script src="../../js/api.js"></script>
+  <script src="../../js/util.js"></script>
+
+  <!-- Dashboard logic -->
+  <script src="../../js/admin-dashboard.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="hdr-wrap">
+    <div class="brand">
+      <a href="../../index.html" class="brand-link">TourBooking</a>
+      <span class="brand-dot">•</span>
+      <span class="brand-sub">Admin</span>
+    </div>
+
+    <nav class="hdr-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../pages/tours.html">Tours</a>
+      <a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+      <a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+      <a href="../../pages/login.html" class="nav-login">Login</a>
+      <a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+    </nav>
   </div>
-</div>
-</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>
+</header>
+
+<main class="container admin-container">
+  <!-- Topbar -->
+  <section class="dash-top">
+    <div>
+      <h1 class="dash-title">Bảng điều khiển</h1>
+      <div class="dash-sub">API base: <b id="baseUrlHint"></b></div>
+    </div>
+    <div class="user-chip">
+      <div class="u-dot"></div>
+      <div>
+        <div class="u-role" id="roleName">Admin</div>
+        <div class="u-email" id="userEmail"></div>
+      </div>
+      <button class="btn small outline" onclick="location.href='../../pages/login.html'">Switch user</button>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-grid" id="statsGrid">
+    <div class="stat-card gradient-1">
+      <div class="stat-label">Tổng Tours</div>
+      <div class="stat-value" id="statTours">—</div>
+      <div class="stat-foot"><span id="statToursHint">đang tải...</span></div>
+    </div>
+
+    <div class="stat-card gradient-2">
+      <div class="stat-label">Bookings (Tổng)</div>
+      <div class="stat-value" id="statBookings">—</div>
+      <div class="stat-foot"><span id="statBookingsHint">đang tải...</span></div>
+    </div>
+
+    <div class="stat-card gradient-3">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value" id="statPending">—</div>
+      <div class="stat-foot"><span id="statPendingHint">đang tải...</span></div>
+    </div>
+
+    <div class="stat-card gradient-4">
+      <div class="stat-label">Doanh thu 30 ngày</div>
+      <div class="stat-value" id="statRevenue">—</div>
+      <div class="stat-foot">đã xác nhận (Confirmed)</div>
+    </div>
+
+    <div class="stat-card gradient-5">
+      <div class="stat-label">Người dùng</div>
+      <div class="stat-value" id="statUsers">—</div>
+      <div class="stat-foot"><span id="statUsersHint">đang tải...</span></div>
+    </div>
+
+    <div class="stat-card gradient-6">
+      <div class="stat-label">Categories</div>
+      <div class="stat-value" id="statCats">—</div>
+      <div class="stat-foot"><span id="statCatsHint">đang tải...</span></div>
+    </div>
+  </section>
+
+  <!-- Quick actions -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">Tác vụ nhanh</h2>
+      <div class="panel-actions">
+        <button class="btn small outline" id="btnRefresh">Làm mới</button>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <a class="qa-btn" href="./categories.html">
+        <div class="qa-ico">📁</div>
+        <div>Categories</div>
+      </a>
+      <a class="qa-btn" href="./tours.html">
+        <div class="qa-ico">🧭</div>
+        <div>Tours</div>
+      </a>
+      <a class="qa-btn" href="./photos.html">
+        <div class="qa-ico">🖼️</div>
+        <div>Photos</div>
+      </a>
+      <a class="qa-btn" href="./discounts.html">
+        <div class="qa-ico">🏷️</div>
+        <div>Discounts</div>
+      </a>
+      <a class="qa-btn" href="./bookings.html">
+        <div class="qa-ico">🧾</div>
+        <div>Bookings</div>
+      </a>
+      <a class="qa-btn" href="./users.html">
+        <div class="qa-ico">👤</div>
+        <div>Users & Roles</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Recent -->
+  <section class="grid-2">
+    <div class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Bookings gần đây</h2>
+        <a class="btn small" href="./bookings.html">Xem tất cả</a>
+      </div>
+      <table class="table compact">
+        <thead>
+          <tr>
+            <th>ID</th><th>User</th><th>Tour</th><th>People</th><th>Status</th><th>Total</th><th>Created</th>
+          </tr>
+        </thead>
+        <tbody id="recentBookings">
+          <tr><td colspan="7" class="muted">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Tours mới</h2>
+        <a class="btn small" href="./tours.html">Quản lý</a>
+      </div>
+      <div class="cards-compact" id="recentTours">
+        <div class="muted">Đang tải...</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">© TourBooking FE • vanilla HTML/CSS/JS</footer>
+</body>
+</html>

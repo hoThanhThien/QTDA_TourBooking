@@ -1,31 +1,516 @@
-<!doctype html>
-<html lang="vi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Home</title>
-<link rel="stylesheet" href="./assets/styles.css">
-<script src="./js/config.js"></script>
-<script src="./js/api.js"></script>
-<script src="./js/util.js"></script>
-</head>
-<body onload="updateNavAuth(); setBaseUrlHint()">
-<header><div>TourBooking FE</div><nav>
-<a href="./index.html">Home</a>
-<a href="./pages/tours.html">Tours</a>
-<a href="./pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
-<a href="./pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
-<a href="./pages/login.html" class="nav-login">Login</a>
-<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
-</nav></header>
-<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tourest Việt Nam - Khám phá dải đất hình chữ S</title>
 
-<div class="card">
-  <h2>Chào mừng!</h2>
-  <p>FE thuần để kết nối Backend của bạn.</p>
-  <ul>
-    <li>Auth: Login/Register (JWT lưu trong localStorage)</li>
-    <li>Public: Tours list + search + pagination + tour detail</li>
-    <li>Customer: Booking, My Bookings, Payment</li>
-    <li>Admin: CRUD Category/Tour/Photo/Discount, Booking list & filter, Users/Roles (read-only)</li>
-  </ul>
-</div>
-</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>
+  <meta name="description" content="Đặt tour du lịch Việt Nam: Hạ Long, Sa Pa, Ninh Bình, Huế, Đà Nẵng, Đà Lạt, Phú Quốc... Giá tốt, thanh toán SePay, hỗ trợ 24/7.">
+  <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml">
+
+  <!-- Theme CSS gốc -->
+  <link rel="stylesheet" href="./assets/css/style.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Comforter+Brush&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Bổ sung nhẹ để ô tìm kiếm/btn hợp style hiện có */
+    .input { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .chip { display:inline-block; padding:6px 10px; border:1px solid #cbd5e1; border-radius:999px; margin:4px; font-size:14px; cursor:pointer; }
+    .chip:hover { background:#f1f5f9; }
+    .pager { display:flex; gap:8px; justify-content:center; margin-top:12px; }
+    .btn-outline { border:1px solid var(--oxford-blue); color:var(--oxford-blue); background:#fff; padding:.6rem 1rem; border-radius:8px; }
+    .btn-outline[disabled] { opacity:.5; cursor:not-allowed; }
+  </style>
+</head>
+
+<body id="top">
+
+  <!-- HEADER -->
+  <header class="header" data-header>
+    <div class="container">
+
+      <a href="./index.html">
+        <h1 class="logo">Tourest VN</h1>
+      </a>
+
+      <button class="nav-toggle-btn" data-nav-toggle-btn aria-label="Toggle Menu">
+        <ion-icon name="menu-outline" class="open"></ion-icon>
+        <ion-icon name="close-outline" class="close"></ion-icon>
+      </button>
+
+      <nav class="navbar">
+        <ul class="navbar-list">
+          <li><a href="./index.html" class="navbar-link">Trang chủ</a></li>
+          <li><a href="./pages/tours.html" class="navbar-link">Tour</a></li>
+          <li><a href="./pages/my-bookings.html" class="navbar-link">Đơn của tôi</a></li>
+          <li><a href="./pages/admin/dashboard.html" class="navbar-link">Admin</a></li>
+          <li><a href="./pages/login.html" class="navbar-link">Đăng nhập</a></li>
+        </ul>
+        <a href="./pages/tours.html" class="btn btn-secondary">Đặt tour ngay</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main>
+    <article>
+
+      <!-- HERO -->
+      <section class="section hero"
+        style="background-image: url('./assets/images/hero-bg-bottom.png'), url('./assets/images/hero-bg-top.png');">
+        <div class="container">
+
+          <img src="./assets/images/shape-1.png" width="61" height="61" alt="Vector Shape" class="shape shape-1">
+          <img src="./assets/images/shape-2.png" width="56" height="74" alt="Vector Shape" class="shape shape-2">
+          <img src="./assets/images/shape-3.png" width="57" height="72" alt="Vector Shape" class="shape shape-3">
+
+          <div class="hero-content">
+            <p class="section-subtitle">Khám phá Việt Nam</p>
+            <h2 class="hero-title">Đặt tour dễ dàng, trải nghiệm trọn vẹn</h2>
+            <p class="hero-text">
+              Hành trình về miền di sản – vịnh Hạ Long, phố cổ Hội An, cố đô Huế, cao nguyên Đà Lạt và biển xanh Phú Quốc.
+            </p>
+            <div class="btn-group">
+              <a href="./pages/tours.html" class="btn btn-primary">Xem tour hot</a>
+              <a href="./pages/login.html" class="btn btn-outline">Đăng nhập / Đăng ký</a>
+            </div>
+          </div>
+
+          <figure class="hero-banner">
+            <img src="./assets/images/hero-banner.png" width="686" height="812" loading="lazy" alt="Việt Nam tươi đẹp" class="w-100">
+          </figure>
+
+        </div>
+      </section>
+
+      <!-- DESTINATION (Việt Nam) -->
+      <section class="section destination">
+        <div class="container">
+
+          <p class="section-subtitle">Điểm đến</p>
+          <h2 class="h2 section-title">Chọn nơi bạn muốn đến</h2>
+
+          <ul class="destination-list">
+            <li class="w-50">
+              <a href="./pages/tours.html" class="destination-card">
+                <figure class="card-banner">
+                  <img src="./assets/images/destination-1.jpg" width="1140" height="1100" loading="lazy" alt="Vịnh Hạ Long" class="img-cover">
+                </figure>
+                <div class="card-content">
+                  <p class="card-subtitle">Quảng Ninh</p>
+                  <h3 class="h3 card-title">Vịnh Hạ Long</h3>
+                </div>
+              </a>
+            </li>
+
+            <li class="w-50">
+              <a href="./pages/tours.html" class="destination-card">
+                <figure class="card-banner">
+                  <img src="./assets/images/destination-2.jpg" width="1140" height="1100" loading="lazy" alt="Sa Pa" class="img-cover">
+                </figure>
+                <div class="card-content">
+                  <p class="card-subtitle">Lào Cai</p>
+                  <h3 class="h3 card-title">Sa Pa</h3>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="./pages/tours.html" class="destination-card">
+                <figure class="card-banner">
+                  <img src="./assets/images/destination-3.jpg" width="1110" height="480" loading="lazy" alt="Tràng An - Ninh Bình" class="img-cover">
+                </figure>
+                <div class="card-content">
+                  <p class="card-subtitle">Ninh Bình</p>
+                  <h3 class="h3 card-title">Tràng An</h3>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="./pages/tours.html" class="destination-card">
+                <figure class="card-banner">
+                  <img src="./assets/images/destination-4.jpg" width="1110" height="480" loading="lazy" alt="Cố đô Huế" class="img-cover">
+                </figure>
+                <div class="card-content">
+                  <p class="card-subtitle">Thừa Thiên Huế</p>
+                  <h3 class="h3 card-title">Cố đô Huế</h3>
+                </div>
+              </a>
+            </li>
+
+            <li>
+              <a href="./pages/tours.html" class="destination-card">
+                <figure class="card-banner">
+                  <img src="./assets/images/destination-5.jpg" width="1110" height="480" loading="lazy" alt="Phú Quốc" class="img-cover">
+                </figure>
+                <div class="card-content">
+                  <p class="card-subtitle">Kiên Giang</p>
+                  <h3 class="h3 card-title">Phú Quốc</h3>
+                </div>
+              </a>
+            </li>
+          </ul>
+
+        </div>
+      </section>
+
+      <!-- FEATURED TOURS (động từ API) -->
+      <section class="section popular">
+        <div class="container">
+          <p class="section-subtitle">Tour nổi bật</p>
+          <h2 class="h2 section-title">Đang được đặt nhiều</h2>
+
+          <!-- Bộ lọc nhanh địa danh VN -->
+          <div style="margin-bottom:10px">
+            <span class="chip" data-q="Hạ Long">Hạ Long</span>
+            <span class="chip" data-q="Sa Pa">Sa Pa</span>
+            <span class="chip" data-q="Ninh Bình">Ninh Bình</span>
+            <span class="chip" data-q="Huế">Huế</span>
+            <span class="chip" data-q="Đà Nẵng">Đà Nẵng</span>
+            <span class="chip" data-q="Hội An">Hội An</span>
+            <span class="chip" data-q="Đà Lạt">Đà Lạt</span>
+            <span class="chip" data-q="Phú Quốc">Phú Quốc</span>
+            <span class="chip" data-q="Cần Thơ">Cần Thơ</span>
+          </div>
+
+          <div class="row" style="display:flex; gap:8px; align-items:center; margin-bottom:16px">
+            <input id="home-q" class="input" placeholder="Tìm tour theo tên/địa điểm (ví dụ: Đà Nẵng, Hạ Long)" style="max-width:360px">
+            <select id="home-sort" class="input" style="max-width:220px">
+              <option value="created_at_desc">Mới nhất</option>
+              <option value="price_asc">Giá tăng</option>
+              <option value="price_desc">Giá giảm</option>
+              <option value="start_date_asc">Ngày đi sớm → muộn</option>
+              <option value="start_date_desc">Ngày đi muộn → sớm</option>
+            </select>
+            <button class="btn" id="home-search">Tìm</button>
+          </div>
+
+          <ul class="popular-list" id="popular-list">
+            <!-- Render bằng JS -->
+          </ul>
+
+          <div class="pager" id="home-pager"></div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="section about">
+        <div class="container">
+          <div class="about-content">
+            <p class="section-subtitle">Về chúng tôi</p>
+            <h2 class="h2 section-title">Đồng hành cùng bạn trên mọi hành trình</h2>
+            <p class="about-text">
+              Đội ngũ tư vấn tận tâm, lịch trình linh hoạt, đối tác lưu trú & vận chuyển uy tín. Thanh toán SePay nhanh chóng, an toàn.
+            </p>
+
+            <ul class="about-list">
+              <li class="about-item">
+                <div class="about-item-icon"><ion-icon name="compass"></ion-icon></div>
+                <div class="about-item-content">
+                  <h3 class="h3 about-item-title">Hướng dẫn viên bản địa</h3>
+                  <p class="about-item-text">Kinh nghiệm – thân thiện – am hiểu văn hoá vùng miền.</p>
+                </div>
+              </li>
+
+              <li class="about-item">
+                <div class="about-item-icon"><ion-icon name="briefcase"></ion-icon></div>
+                <div class="about-item-content">
+                  <h3 class="h3 about-item-title">Giá hợp lý</h3>
+                  <p class="about-item-text">Minh bạch chi phí, nhiều mã ưu đãi theo mùa.</p>
+                </div>
+              </li>
+
+              <li class="about-item">
+                <div class="about-item-icon"><ion-icon name="umbrella"></ion-icon></div>
+                <div class="about-item-content">
+                  <h3 class="h3 about-item-title">Uy tín & an toàn</h3>
+                  <p class="about-item-text">Bảo hiểm du lịch & tiêu chuẩn vận hành rõ ràng.</p>
+                </div>
+              </li>
+            </ul>
+
+            <a href="./pages/tours.html" class="btn btn-primary">Bắt đầu đặt tour</a>
+          </div>
+
+          <figure class="about-banner">
+            <img src="./assets/images/about-banner.png" width="756" height="842" loading="lazy" alt="Trải nghiệm Việt Nam" class="w-100">
+          </figure>
+        </div>
+      </section>
+
+      <!-- BLOG (giữ demo) -->
+      <section class="section blog">
+        <div class="container">
+          <p class="section-subtitle">Tin & Bài viết</p>
+          <h2 class="h2 section-title">Gợi ý hành trình mới nhất</h2>
+
+          <ul class="blog-list">
+            <li>
+              <div class="blog-card">
+                <figure class="card-banner">
+                  <a href="#"><img src="./assets/images/popular-1.jpg" width="740" height="518" loading="lazy" alt="Kinh nghiệm Hạ Long" class="img-cover"></a>
+                  <span class="card-badge"><ion-icon name="time-outline"></ion-icon><time datetime="12-04">04 Dec</time></span>
+                </figure>
+                <div class="card-content">
+                  <div class="card-wrapper">
+                    <div class="author-wrapper">
+                      <figure class="author-avatar"><img src="./assets/images/author-avatar.png" width="30" height="30" alt="Biên tập viên"></figure>
+                      <div><a href="#" class="author-name">Team Tourest VN</a><p class="author-title">Travel blog</p></div>
+                    </div>
+                    <time class="publish-time" datetime="10:30">10:30 AM</time>
+                  </div>
+                  <h3 class="card-title"><a href="#">Hạ Long 2N1Đ: lịch trình “chill” cho cuối tuần</a></h3>
+                  <a href="#" class="btn-link"><span>Đọc thêm</span><ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="blog-card">
+                <figure class="card-banner">
+                  <a href="#"><img src="./assets/images/blog-2.jpg" width="740" height="518" loading="lazy" alt="Huế - Hội An - Đà Nẵng" class="img-cover"></a>
+                  <span class="card-badge"><ion-icon name="time-outline"></ion-icon><time datetime="12-04">04 Dec</time></span>
+                </figure>
+                <div class="card-content">
+                  <div class="card-wrapper">
+                    <div class="author-wrapper">
+                      <figure class="author-avatar"><img src="./assets/images/author-avatar.png" width="30" height="30" alt="Biên tập viên"></figure>
+                      <div><a href="#" class="author-name">Team Tourest VN</a><p class="author-title">Travel blog</p></div>
+                    </div>
+                    <time class="publish-time" datetime="10:30">10:30 AM</time>
+                  </div>
+                  <h3 class="card-title"><a href="#">Combo Huế – Hội An – Đà Nẵng 4N3Đ: ăn gì, đi đâu?</a></h3>
+                  <a href="#" class="btn-link"><span>Đọc thêm</span><ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <div class="blog-card">
+                <figure class="card-banner">
+                  <a href="#"><img src="./assets/images/blog-3.jpg" width="740" height="518" loading="lazy" alt="Đà Lạt" class="img-cover"></a>
+                  <span class="card-badge"><ion-icon name="time-outline"></ion-icon><time datetime="12-04">04 Dec</time></span>
+                </figure>
+                <div class="card-content">
+                  <div class="card-wrapper">
+                    <div class="author-wrapper">
+                      <figure class="author-avatar"><img src="./assets/images/author-avatar.png" width="30" height="30" alt="Biên tập viên"></figure>
+                      <div><a href="#" class="author-name">Team Tourest VN</a><p class="author-title">Travel blog</p></div>
+                    </div>
+                    <time class="publish-time" datetime="10:30">10:30 AM</time>
+                  </div>
+                  <h3 class="card-title"><a href="#">Đà Lạt cho người lần đầu: 3N2Đ quá đủ</a></h3>
+                  <a href="#" class="btn-link"><span>Đọc thêm</span><ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon></a>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+        </div>
+      </section>
+
+    </article>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" style="background-image: url('./assets/images/footer-bg.png')">
+    <div class="container">
+
+      <div class="footer-top">
+        <ul class="footer-list">
+          <li><p class="footer-list-title">Điểm đến hot</p></li>
+          <li><a href="./pages/tours.html" class="footer-link">Hạ Long</a></li>
+          <li><a href="./pages/tours.html" class="footer-link">Sa Pa</a></li>
+          <li><a href="./pages/tours.html" class="footer-link">Ninh Bình</a></li>
+          <li><a href="./pages/tours.html" class="footer-link">Huế - Đà Nẵng</a></li>
+          <li><a href="./pages/tours.html" class="footer-link">Phú Quốc</a></li>
+        </ul>
+
+        <ul class="footer-list">
+          <li><p class="footer-list-title">Chuyên mục</p></li>
+          <li><a href="#" class="footer-link">Travel Tips</a></li>
+          <li><a href="#" class="footer-link">Ẩm thực</a></li>
+          <li><a href="#" class="footer-link">Văn hoá</a></li>
+          <li><a href="#" class="footer-link">Lịch lễ Tết</a></li>
+        </ul>
+
+        <ul class="footer-list">
+          <li><p class="footer-list-title">Liên kết nhanh</p></li>
+          <li><a href="./pages/tours.html" class="footer-link">Tour</a></li>
+          <li><a href="./pages/booking.html" class="footer-link">Đặt tour</a></li>
+          <li><a href="./pages/my-bookings.html" class="footer-link">Đơn của tôi</a></li>
+          <li><a href="./pages/admin/dashboard.html" class="footer-link">Quản trị</a></li>
+        </ul>
+
+        <div class="footer-list">
+          <p class="footer-list-title">Nhận bản tin</p>
+          <p class="newsletter-text">Deal hot mỗi tuần – vào thẳng inbox của bạn</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault();alert('Đã đăng ký nhận tin!');">
+            <input type="email" name="email" required placeholder="Email của bạn" class="newsletter-input">
+            <button type="submit" class="btn btn-primary">Đăng ký</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <a href="./index.html" class="logo">Tourest VN</a>
+        <p class="copyright">
+          &copy; 2025 Tourest Việt Nam. All Rights Reserved
+        </p>
+        <ul class="social-list">
+          <li><a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a></li>
+          <li><a href="#" class="social-link"><ion-icon name="logo-instagram"></ion-icon></a></li>
+          <li><a href="#" class="social-link"><ion-icon name="logo-tiktok"></ion-icon></a></li>
+        </ul>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- GO TO TOP -->
+  <a href="#top" class="go-top" data-go-top aria-label="Go To Top">
+    <ion-icon name="chevron-up-outline"></ion-icon>
+  </a>
+
+  <!-- JS động: CONFIG + Featured Tours -->
+  <script>
+    // 🔧 CHỈNH ĐÚNG API BACKEND Ở ĐÂY
+    // Local:  http://127.0.0.1:8000
+    // Host:   https://api.ten-mien-cua-ban.com
+    const CONFIG = { BASE_URL: "http://127.0.0.1:8000" };
+
+    async function api(path, opts = {}) {
+      const res = await fetch(CONFIG.BASE_URL + path, {
+        method: opts.method || "GET",
+        headers: { "Content-Type": "application/json" },
+        body: opts.body ? JSON.stringify(opts.body) : null
+      });
+      const raw = await res.text();
+      let data; try { data = JSON.parse(raw); } catch { data = { raw }; }
+      if (!res.ok) throw new Error(data?.message || ("HTTP " + res.status));
+      return data;
+    }
+
+    const state = { page: 1, pageSize: 6, q: "", sort: "created_at_desc" };
+
+    function daysBetween(a, b) {
+      if(!a || !b) return null;
+      const d1 = new Date(a), d2 = new Date(b);
+      const diff = Math.round((d2 - d1) / 86400000) + 1;
+      return diff > 0 ? diff : null;
+    }
+
+    function renderPopular(items, meta) {
+      const ul = document.getElementById("popular-list");
+      ul.innerHTML = "";
+
+      if (!items.length) {
+        ul.innerHTML = '<li><div class="popular-card"><div class="card-content"><p>Không tìm thấy tour phù hợp.</p></div></div></li>';
+        document.getElementById("home-pager").innerHTML = "";
+        return;
+      }
+
+      items.forEach(t => {
+        const dayCount = daysBetween(t.start_date, t.end_date);
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <div class="popular-card">
+            <figure class="card-banner">
+              <a href="./pages/tour-detail.html?id=${t.id}">
+                <img src="${t.primary_photo || 'https://picsum.photos/seed/'+t.id+'/740/518'}"
+                     width="740" height="518" loading="lazy" alt="${t.title}" class="img-cover">
+              </a>
+              <span class="card-badge">
+                <ion-icon name="time-outline"></ion-icon>
+                <time>${dayCount ? (dayCount+' ngày') : 'Linh hoạt'}</time>
+              </span>
+            </figure>
+
+            <div class="card-content">
+              <div class="card-wrapper">
+                <div class="card-price">Từ ${Number(t.price).toLocaleString('vi-VN')}đ</div>
+              </div>
+
+              <h3 class="card-title">
+                <a href="./pages/tour-detail.html?id=${t.id}">${t.title}</a>
+              </h3>
+
+              <address class="card-location">${t.location || ''}</address>
+            </div>
+          </div>`;
+        ul.appendChild(li);
+      });
+
+      // Pager
+      const p = document.getElementById("home-pager");
+      p.innerHTML = "";
+      const prev = document.createElement("button");
+      prev.className = "btn-outline";
+      prev.textContent = "← Trước";
+      prev.disabled = !meta.has_prev;
+      prev.onclick = () => { state.page -= 1; loadPopular(); };
+
+      const info = document.createElement("span");
+      info.style.margin = "0 8px";
+      info.textContent = `Trang ${meta.page}/${meta.total_pages}`;
+
+      const next = document.createElement("button");
+      next.className = "btn-outline";
+      next.textContent = "Tiếp →";
+      next.disabled = !meta.has_next;
+      next.onclick = () => { state.page += 1; loadPopular(); };
+
+      p.appendChild(prev); p.appendChild(info); p.appendChild(next);
+    }
+
+    async function loadPopular() {
+      const { page, pageSize, q, sort } = state;
+      try {
+        const res = await api(`/tours?page=${page}&page_size=${pageSize}&q=${encodeURIComponent(q)}&sort=${encodeURIComponent(sort)}`);
+        const items = res?.data?.items || [];
+        const meta  = res?.data?.meta  || { page:1, total_pages:1, has_prev:false, has_next:false };
+        renderPopular(items, meta);
+      } catch (e) {
+        const ul = document.getElementById("popular-list");
+        ul.innerHTML = `<li><div class="popular-card"><div class="card-content"><p class="error">${e.message}</p></div></div></li>`;
+        document.getElementById("home-pager").innerHTML = "";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Search button
+      document.getElementById("home-search").addEventListener("click", () => {
+        state.q = document.getElementById("home-q").value.trim();
+        state.sort = document.getElementById("home-sort").value;
+        state.page = 1;
+        loadPopular();
+      });
+
+      // Quick chips
+      document.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const q = chip.getAttribute("data-q") || "";
+          document.getElementById("home-q").value = q;
+          state.q = q; state.page = 1;
+          loadPopular();
+        });
+      });
+
+      loadPopular();
+    });
+  </script>
+
+  <!-- Theme JS (menu, go-top, ...) -->
+  <script src="./assets/js/script.js"></script>
+
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
