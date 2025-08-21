@@ -6,16 +6,16 @@
   <title>Admin Dashboard • TourBooking</title>
 
   <!-- Base styles + Admin styles -->
-  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
   <link rel="stylesheet" href="../../assets/css/admin.css" />
 
   <!-- Config & core helpers -->
-  <script src="../../js/config.js"></script>
-  <script src="../../js/api.js"></script>
-  <script src="../../js/util.js"></script>
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/api.js"></script>
+  <script src="../../assets/js/util.js"></script>
 
   <!-- Dashboard logic -->
-  <script src="../../js/admin-dashboard.js" defer></script>
+  <script src="../../assets/js/admin-dashboard.js" defer></script>
 </head>
 <body>
 <header class="site-header">
@@ -42,7 +42,9 @@
   <section class="dash-top">
     <div>
       <h1 class="dash-title">Bảng điều khiển</h1>
-      <div class="dash-sub">API base: <b id="baseUrlHint"></b></div>
+      <!--
+      debug kết nói
+      <div class="dash-sub">API base: <b id="baseUrlHint"></b></div>-->
     </div>
     <div class="user-chip">
       <div class="u-dot"></div>
@@ -81,7 +83,7 @@
     </div>
 
     <div class="stat-card gradient-5">
-      <div class="stat-label">Người dùng</div>
+      <div class="stat-label">Khách Hàng</div>
       <div class="stat-value" id="statUsers">—</div>
       <div class="stat-foot"><span id="statUsersHint">đang tải...</span></div>
     </div>

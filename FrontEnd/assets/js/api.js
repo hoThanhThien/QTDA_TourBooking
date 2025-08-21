@@ -4,14 +4,23 @@ function clearToken(){ localStorage.removeItem("token"); }
 function setUserInfo(role, email){ if(role) localStorage.setItem("role_name", role); if(email) localStorage.setItem("user_email", email); }
 function getRole(){ return localStorage.getItem("role_name") || ""; }
 function authHeader(){ const t = getToken(); return t ? {"Authorization":"Bearer "+t} : {}; }
-async function api(path, { method="GET", body=null, auth=false, headers={} } = {}){
-  const url = CONFIG.BASE_URL + path;
-  const allHeaders = { "Content-Type": "application/json", ...headers };
-  if(auth){ Object.assign(allHeaders, authHeader()); }
-  const res = await fetch(url, { method, headers: allHeaders, body: body ? JSON.stringify(body) : null });
+async function api(path, { method='GET', auth=false, body=null, headers={} } = {}) {
+  if (window.API_READY && typeof window.API_READY.then === 'function') { await window.API_READY; } // 👈 thêm
+  const BASE = window.CONFIG.BASE_URL;                                                               // 👈 dùng từ config
+  
+  const h = { 'Content-Type': 'application/json', ...headers };
+  if (auth) {
+    const tk = localStorage.getItem('token');
+    if (tk) h['Authorization'] = 'Bearer ' + tk;
+  }
+  const res = await fetch(BASE + path, {
+    method,
+    headers: h,
+    body: body ? JSON.stringify(body) : null
+  });
   const raw = await res.text();
   let data; try { data = JSON.parse(raw); } catch { data = { raw }; }
-  if(!res.ok) throw new Error(data?.message || ("HTTP "+res.status));
+  if (!res.ok) throw new Error(data?.message || ('HTTP '+res.status));
   return data;
 }
 function updateNavAuth(){
