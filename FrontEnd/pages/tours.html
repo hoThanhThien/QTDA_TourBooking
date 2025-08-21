@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tours</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../index.html">Home</a>
+<a href="../pages/tours.html">Tours</a>
+<a href="../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<div class="card">
+  <div class="row">
+    <input id="q" class="input" placeholder="Tìm tour theo tên/địa điểm">
+    <select id="sort" class="input">
+      <option value="created_at_desc">Mới nhất</option>
+      <option value="price_asc">Giá tăng</option>
+      <option value="price_desc">Giá giảm</option>
+      <option value="start_date_asc">Ngày đi sớm → muộn</option>
+      <option value="start_date_desc">Ngày đi muộn → sớm</option>
+    </select>
+    <button class="btn" onclick="loadTours(1)">Tìm</button>
+  </div>
+  <div id="grid" class="grid"></div>
+  <div id="pager"></div>
+</div>
+<script>
+let pageSize = 8;
+async function loadTours(page){
+  const q = document.getElementById('q').value.trim();
+  const sort = document.getElementById('sort').value;
+  try{
+    const res = await api(`/tours?page=${page}&page_size=${pageSize}&q=${encodeURIComponent(q)}&sort=${encodeURIComponent(sort)}`);
+    const items = res?.data?.items || [];
+    const meta = res?.data?.meta || {page:1,total_pages:1,page_size:pageSize,has_next:false,has_prev:false};
+    const grid = document.getElementById('grid'); grid.innerHTML='';
+    items.forEach(t=>{
+      const div = document.createElement('div'); div.className='card';
+      div.innerHTML = `
+        <img src="${t.primary_photo || 'https://picsum.photos/seed/'+t.id+'/600/360'}" alt="photo">
+        <h3>${t.title}</h3>
+        <div class="badge">${t.location||''}</div>
+        <div>Giá: <b>${Number(t.price).toLocaleString('vi-VN')}đ</b></div>
+        <div class="row">
+          <a class="btn small" href="./tour-detail.html?id=${t.id}">Xem chi tiết</a>
+          <a class="btn secondary small" href="./booking.html?tourId=${t.id}">Đặt ngay</a>
+        </div>`;
+      grid.appendChild(div);
+    });
+    renderPager(meta, document.getElementById('pager'), (p)=> loadTours(p));
+  }catch(e){
+    document.getElementById('grid').innerHTML = '<div class="error">'+e.message+'</div>';
+  }
+}
+document.addEventListener('DOMContentLoaded', ()=> loadTours(1));
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

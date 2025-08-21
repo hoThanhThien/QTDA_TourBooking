@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Tours</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../../index.html">Home</a>
+<a href="../../pages/tours.html">Tours</a>
+<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<script>guardAdmin();</script>
+<div class="card">
+  <h3>Tours</h3>
+  <div class="row">
+    <input id="q" class="input" placeholder="Tìm...">
+    <select id="sort" class="input">
+      <option value="created_at_desc">Mới nhất</option>
+      <option value="price_asc">Giá tăng</option>
+      <option value="price_desc">Giá giảm</option>
+    </select>
+    <button class="btn" onclick="loadTours(1)">Tìm</button>
+  </div>
+  <div class="row">
+    <input id="title" class="input" placeholder="Tiêu đề">
+    <input id="price" class="input" placeholder="Giá">
+    <input id="catId" class="input" placeholder="Category ID">
+    <input id="loc" class="input" placeholder="Địa điểm">
+    <button class="btn" onclick="createTour()">Tạo</button>
+  </div>
+  <table class="table"><thead><tr><th>ID</th><th>Title</th><th>Price</th><th>Location</th><th>Actions</th></tr></thead><tbody id="tb"></tbody></table>
+  <div id="pager"></div>
+</div>
+<script>
+let pageSize=10;
+async function loadTours(page){
+  const q=document.getElementById('q').value.trim();
+  const sort=document.getElementById('sort').value;
+  const res = await api(`/tours?page=${page}&page_size=${pageSize}&q=${encodeURIComponent(q)}&sort=${encodeURIComponent(sort)}`);
+  const items = res?.data?.items || []; const meta = res?.data?.meta;
+  document.getElementById('tb').innerHTML = items.map(t=>`
+    <tr>
+      <td>${t.id}</td><td>${t.title}</td><td>${Number(t.price).toLocaleString('vi-VN')}</td><td>${t.location||''}</td>
+      <td>
+        <button class="btn small" onclick="editTour(${t.id})">Sửa</button>
+        <button class="btn secondary small" onclick="delTour(${t.id})">Xoá</button>
+        <a class="btn small" href="./photos.html?tourId=${t.id}">Ảnh</a>
+      </td>
+    </tr>`).join('');
+  renderPager(meta, document.getElementById('pager'), (p)=> loadTours(p));
+}
+async function createTour(){
+  const title = document.getElementById('title').value.trim();
+  const price = parseFloat(document.getElementById('price').value||0);
+  const category_id = parseInt(document.getElementById('catId').value||0);
+  const location = document.getElementById('loc').value.trim();
+  if(!title || !price || !category_id) return alert('Thiếu dữ liệu');
+  await api('/tours',{ method:'POST', auth:true, body:{ title, price, category_id, location } });
+  document.getElementById('title').value=''; document.getElementById('price').value=''; document.getElementById('catId').value=''; document.getElementById('loc').value='';
+  loadTours(1);
+}
+async function delTour(id){
+  if(!confirm('Xoá tour #'+id+'?')) return;
+  await api('/tours/'+id,{ method:'DELETE', auth:true });
+  loadTours(1);
+}
+async function editTour(id){
+  const title = prompt('Title mới:'); if(title==null) return;
+  const price = parseFloat(prompt('Giá mới:')||0); if(!price) return alert('Giá không hợp lệ');
+  const t = await api('/tours/'+id);
+  const body = { category_id: t.data.category_id, title, description: t.data.description, location: t.data.location, capacity: t.data.capacity, price, start_date: t.data.start_date, end_date: t.data.end_date, status: t.data.status };
+  await api('/tours/'+id,{ method:'PUT', auth:true, body });
+  loadTours(1);
+}
+document.addEventListener('DOMContentLoaded', ()=> loadTours(1));
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

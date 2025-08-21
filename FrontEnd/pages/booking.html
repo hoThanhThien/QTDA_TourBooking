@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Booking</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../index.html">Home</a>
+<a href="../pages/tours.html">Tours</a>
+<a href="../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<div class="card">
+  <h3>Đặt tour</h3>
+  <div class="row"><label>Tour ID:</label><input id="tourId" class="input" readonly></div>
+  <div class="row"><label>Số người:</label><input id="people" class="input" type="number" min="1" value="1"></div>
+  <div class="row"><label>Mã giảm giá:</label><input id="code" class="input" placeholder="Ví dụ: NOEL20"></div>
+  <div class="row"><button class="btn" onclick="createBooking()">Tạo booking</button></div>
+  <div id="msg"></div>
+</div>
+<script>
+guardCustomer();
+document.addEventListener('DOMContentLoaded', ()=>{
+  const id = new URLSearchParams(location.search).get('tourId') || '';
+  document.getElementById('tourId').value = id;
+});
+async function createBooking(){
+  const tour_id = parseInt(document.getElementById('tourId').value,10);
+  const number_of_people = parseInt(document.getElementById('people').value,10);
+  const discount_code = document.getElementById('code').value.trim() || undefined;
+  try{
+    const res = await api('/bookings',{ method:'POST', auth:true, body:{ tour_id, number_of_people, discount_code } });
+    const bk = res?.data;
+    document.getElementById('msg').innerHTML = `
+      <div class="success">Đã tạo booking #${bk.booking_id}, tổng tiền: ${Number(bk.total).toLocaleString('vi-VN')}đ</div>
+      <div class="row">
+        <button class="btn" onclick="pay(${bk.booking_id})">Thanh toán (SePay)</button>
+        <a class="btn secondary" href="./my-bookings.html">Xem booking của tôi</a>
+      </div>`;
+  }catch(e){ document.getElementById('msg').innerHTML = '<div class="error">'+e.message+'</div>'; }
+}
+async function pay(booking_id){
+  try{
+    const res = await api('/payments/create',{ method:'POST', auth:true, body:{ booking_id } });
+    const url = res?.data?.pay_url;
+    if(url){ window.location.href = url; }
+    else{ alert('Không nhận được pay_url từ SePay (kiểm tra cấu hình backend)'); }
+  }catch(e){ alert(e.message); }
+}
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

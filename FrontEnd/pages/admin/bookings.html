@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Bookings</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../../index.html">Home</a>
+<a href="../../pages/tours.html">Tours</a>
+<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<script>guardAdmin();</script>
+<div class="card">
+  <h3>Bookings</h3>
+  <div class="row">
+    <select id="status" class="input"><option value="">(All)</option><option>Pending</option><option>Confirmed</option><option>Cancelled</option></select>
+    <input id="userId" class="input" placeholder="User ID">
+    <input id="tourId" class="input" placeholder="Tour ID">
+    <input id="from" class="input" placeholder="From (YYYY-MM-DD)">
+    <input id="to" class="input" placeholder="To (YYYY-MM-DD)">
+    <button class="btn" onclick="loadB(1)">Lọc</button>
+  </div>
+  <table class="table"><thead><tr><th>ID</th><th>User</th><th>Tour</th><th>People</th><th>Status</th><th>Total</th><th>Action</th></tr></thead><tbody id="tb"></tbody></table>
+  <div id="pager"></div>
+</div>
+<script>
+let pageSize=12;
+async function loadB(page){
+  const qs = new URLSearchParams();
+  const status = document.getElementById('status').value; if(status) qs.set('status',status);
+  const userId = document.getElementById('userId').value.trim(); if(userId) qs.set('user_id',userId);
+  const tourId = document.getElementById('tourId').value.trim(); if(tourId) qs.set('tour_id',tourId);
+  const d1 = document.getElementById('from').value.trim(); if(d1) qs.set('date_from',d1);
+  const d2 = document.getElementById('to').value.trim(); if(d2) qs.set('date_to',d2);
+  qs.set('page',page); qs.set('page_size',pageSize);
+  const res = await api('/bookings?'+qs.toString(), { auth:true });
+  const items = res?.data?.items || []; const meta = res?.data?.meta;
+  document.getElementById('tb').innerHTML = items.map(b=>`
+    <tr>
+      <td>${b.id}</td><td>${b.username||''}</td><td>${b.title||''}</td>
+      <td>${b.number_of_people}</td><td>${b.status}</td><td>${Number(b.total_amount).toLocaleString('vi-VN')}</td>
+      <td>
+        <select id="st${b.id}">
+          <option ${b.status==='Pending'?'selected':''}>Pending</option>
+          <option ${b.status==='Confirmed'?'selected':''}>Confirmed</option>
+          <option ${b.status==='Cancelled'?'selected':''}>Cancelled</option>
+        </select>
+        <button class="btn small" onclick="upd(${b.id})">Cập nhật</button>
+      </td>
+    </tr>
+  `).join('');
+  renderPager(meta, document.getElementById('pager'), (p)=> loadB(p));
+}
+async function upd(id){
+  const status = document.getElementById('st'+id).value;
+  await api('/bookings/'+id+'/status',{ method:'PATCH', auth:true, body:{ status } });
+  loadB(1);
+}
+document.addEventListener('DOMContentLoaded', ()=> loadB(1));
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

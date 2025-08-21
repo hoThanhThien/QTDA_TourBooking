@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tour Detail</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../index.html">Home</a>
+<a href="../pages/tours.html">Tours</a>
+<a href="../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<div class="card" id="detail">Đang tải...</div>
+<script>
+async function loadDetail(){
+  const id = new URLSearchParams(location.search).get('id');
+  if(!id){ document.getElementById('detail').textContent='Thiếu id'; return; }
+  try{
+    const res = await api('/tours/'+id);
+    const t = res?.data;
+    const el = document.getElementById('detail');
+    const photos = (t.photos||[]).map(p=>`<img src="${p.image_url}" alt="${p.caption||''}">`).join('');
+    el.innerHTML = `
+      <h2>${t.title}</h2>
+      <div class="row"><span class="badge">${t.category_name||''}</span><span class="badge">${t.location||''}</span><span class="badge">${t.status}</span></div>
+      <p>${t.description||''}</p>
+      <div>Thời gian: ${t.start_date||''} → ${t.end_date||''}</div>
+      <div>Giá: <b>${Number(t.price).toLocaleString('vi-VN')}đ</b> | Sức chứa: ${t.capacity||0}</div>
+      <div class="gallery">${photos}</div>
+      <div class="row"><a class="btn" href="./booking.html?tourId=${t.id}">Đặt ngay</a></div>
+    `;
+  }catch(e){
+    document.getElementById('detail').innerHTML = '<div class="error">'+e.message+'</div>';
+  }
+}
+document.addEventListener('DOMContentLoaded', loadDetail);
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

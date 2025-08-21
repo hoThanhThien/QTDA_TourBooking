@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Categories</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../../index.html">Home</a>
+<a href="../../pages/tours.html">Tours</a>
+<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<script>guardAdmin();</script>
+<div class="card">
+  <h3>Categories</h3>
+  <div class="row">
+    <input id="q" class="input" placeholder="Tìm tên">
+    <button class="btn" onclick="loadCats(1)">Tìm</button>
+  </div>
+  <div class="row">
+    <input id="name" class="input" placeholder="Tên category">
+    <input id="desc" class="input" placeholder="Mô tả">
+    <button class="btn" onclick="createCat()">Tạo</button>
+  </div>
+  <table class="table"><thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead><tbody id="tb"></tbody></table>
+  <div id="pager"></div>
+</div>
+<script>
+let pageSize=10;
+async function loadCats(page){
+  const q=document.getElementById('q').value.trim();
+  const res = await api(`/categories?page=${page}&page_size=${pageSize}&q=${encodeURIComponent(q)}`);
+  const items = res?.data?.items || [];
+  const meta = res?.data?.meta;
+  document.getElementById('tb').innerHTML = items.map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.description||''}</td></tr>`).join('');
+  renderPager(meta, document.getElementById('pager'), (p)=> loadCats(p));
+}
+async function createCat(){
+  const name=document.getElementById('name').value.trim();
+  const description=document.getElementById('desc').value.trim();
+  if(!name) return alert('Thiếu tên');
+  await api('/categories',{ method:'POST', auth:true, body:{name,description} });
+  document.getElementById('name').value=''; document.getElementById('desc').value='';
+  loadCats(1);
+}
+document.addEventListener('DOMContentLoaded', ()=> loadCats(1));
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

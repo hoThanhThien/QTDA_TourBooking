@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Bookings</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../index.html">Home</a>
+<a href="../pages/tours.html">Tours</a>
+<a href="../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<div class="card">
+  <div class="row">
+    <label>Trạng thái:</label>
+    <select id="status" class="input"><option value="">(All)</option><option>Pending</option><option>Confirmed</option><option>Cancelled</option></select>
+    <button class="btn" onclick="loadMy(1)">Lọc</button>
+  </div>
+  <table class="table" id="tbl">
+    <thead><tr><th>ID</th><th>Tour</th><th>People</th><th>Status</th><th>Total</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div id="pager"></div>
+</div>
+<script>
+guardCustomer();
+let pageSize=10;
+async function loadMy(page){
+  const status = document.getElementById('status').value;
+  const qs = new URLSearchParams(); qs.set('page', page); qs.set('page_size', pageSize); if(status) qs.set('status', status);
+  try{
+    const res = await api('/my/bookings?'+qs.toString(), { auth:true });
+    const items = res?.data?.items || []; const meta = res?.data?.meta;
+    const tb = document.querySelector('#tbl tbody');
+    tb.innerHTML = items.map(b=>`
+      <tr>
+        <td>#${b.id}</td><td>${b.title||''}</td><td>${b.number_of_people}</td><td>${b.status}</td>
+        <td>${Number(b.total_amount).toLocaleString('vi-VN')}đ</td>
+        <td>${b.status==='Pending' ? `<button class="btn small" onclick="pay(${b.id})">Pay</button>`:''}
+            <button class="btn secondary small" onclick="viewPay(${b.id})">Xem thanh toán</button>
+        </td>
+      </tr>`).join('');
+    renderPager(meta, document.getElementById('pager'), (p)=> loadMy(p));
+  }catch(e){ alert(e.message); }
+}
+async function pay(booking_id){
+  try{
+    const res = await api('/payments/create',{ method:'POST', auth:true, body:{ booking_id } });
+    const url = res?.data?.pay_url;
+    if(url){ window.location.href = url; } else { alert('Không nhận được pay_url'); }
+  }catch(e){ alert(e.message); }
+}
+async function viewPay(booking_id){
+  try{
+    const res = await api('/payments/booking/'+booking_id, { auth:true });
+    alert('Payment status: '+ (res?.data?.payment_status || 'Unknown'));
+  }catch(e){ alert(e.message); }
+}
+document.addEventListener('DOMContentLoaded', ()=> loadMy(1));
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Photos</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../../index.html">Home</a>
+<a href="../../pages/tours.html">Tours</a>
+<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<script>guardAdmin();</script>
+<div class="card">
+  <h3>Photos cho tour</h3>
+  <div class="row"><label>Tour ID:</label><input id="tourId" class="input" readonly></div>
+  <div class="row">
+    <input id="url" class="input" placeholder="Image URL">
+    <input id="caption" class="input" placeholder="Caption">
+    <label><input type="checkbox" id="isPrimary"> Primary</label>
+    <button class="btn" onclick="addPhoto()">Thêm ảnh</button>
+  </div>
+  <div id="list" class="grid"></div>
+</div>
+<script>
+let tourId = 0;
+document.addEventListener('DOMContentLoaded', async ()=>{
+  tourId = parseInt(new URLSearchParams(location.search).get('tourId')||0);
+  document.getElementById('tourId').value = tourId;
+  await loadPhotos();
+});
+async function loadPhotos(){
+  const t = await api('/tours/'+tourId);
+  const photos = t?.data?.photos || [];
+  const wrap = document.getElementById('list'); wrap.innerHTML='';
+  photos.forEach(p=>{
+    const div = document.createElement('div'); div.className='card';
+    div.innerHTML = `<img src="${p.image_url}"><div>${p.caption||''}</div><div>ID: ${p.id} ${p.is_primary?'<span class="badge">primary</span>':''}</div>
+      <div class="row">
+        <button class="btn small" onclick="setPrimary(${p.id})">Set primary</button>
+        <button class="btn secondary small" onclick="delPhoto(${p.id})">Xoá</button>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+async function addPhoto(){
+  const image_url = document.getElementById('url').value.trim();
+  const caption = document.getElementById('caption').value.trim();
+  const is_primary = document.getElementById('isPrimary').checked ? 1 : 0;
+  if(!image_url) return alert('Thiếu URL');
+  await api(`/tours/${tourId}/photos`,{ method:'POST', auth:true, body:{ image_url, caption, is_primary } });
+  document.getElementById('url').value=''; document.getElementById('caption').value=''; document.getElementById('isPrimary').checked=false;
+  await loadPhotos();
+}
+async function setPrimary(pid){
+  await api('/photos/'+pid,{ method:'PUT', auth:true, body:{ image_url: prompt('URL mới (để trống giữ nguyên)') || undefined, caption: prompt('Caption mới (để trống giữ nguyên)') || undefined, is_primary: 1 } });
+  await loadPhotos();
+}
+async function delPhoto(pid){
+  if(!confirm('Xoá ảnh #'+pid+'?')) return;
+  await api('/photos/'+pid',{ method:'DELETE', auth:true });
+  await loadPhotos();
+}
+</script>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>

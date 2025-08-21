@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard</title>
+<link rel="stylesheet" href="../../assets/styles.css">
+<script src="../../js/config.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/util.js"></script>
+</head>
+<body onload="updateNavAuth(); setBaseUrlHint()">
+<header><div>TourBooking FE</div><nav>
+<a href="../../index.html">Home</a>
+<a href="../../pages/tours.html">Tours</a>
+<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
+<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
+<a href="../../pages/login.html" class="nav-login">Login</a>
+<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
+</nav></header>
+<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+
+<script>guardAdmin();</script>
+<div class="card">
+  <h3>Admin</h3>
+  <div class="row">
+    <a class="btn" href="./categories.html">Categories</a>
+    <a class="btn" href="./tours.html">Tours</a>
+    <a class="btn" href="./photos.html">Photos</a>
+    <a class="btn" href="./discounts.html">Discounts</a>
+    <a class="btn" href="./bookings.html">Bookings</a>
+    <a class="btn" href="./users.html">Users & Roles</a>
+  </div>
+</div>
+</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>
