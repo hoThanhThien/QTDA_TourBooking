@@ -1,56 +1,43 @@
-<!doctype html>
-<html lang="vi"><head>
+<!doctype html><html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Discounts</title>
-<link rel="stylesheet" href="../../assets/styles.css">
-<script src="../../js/config.js"></script>
-<script src="../../js/api.js"></script>
-<script src="../../js/util.js"></script>
-</head>
-<body onload="updateNavAuth(); setBaseUrlHint()">
-<header><div>TourBooking FE</div><nav>
-<a href="../../index.html">Home</a>
-<a href="../../pages/tours.html">Tours</a>
-<a href="../../pages/my-bookings.html" class="nav-my" style="display:none">My bookings</a>
-<a href="../../pages/admin/dashboard.html" class="nav-admin" style="display:none">Admin</a>
-<a href="../../pages/login.html" class="nav-login">Login</a>
-<a href="#" onclick="logout()" class="nav-logout" style="display:none">Logout</a>
-</nav></header>
-<div class="container"><div class="notice">API base: <b id="baseUrlHint"></b></div>
+<title>Admin • Discounts</title>
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="stylesheet" href="../../assets/css/admin.css">
+<script src="../../assets/js/config.js"></script>
+<script src="../../assets/js/api.js"></script>
+<script src="../../assets/js/util.js"></script>
+<script src="../../assets/js/admin-discounts.js" defer></script>
+</head><body>
+<header class="site-header"><div class="hdr-wrap">
+  <div class="brand"><a class="brand-link" href="../../index.html">TourBooking</a><span class="brand-dot">•</span><span class="brand-sub">Admin</span></div>
+  <nav class="hdr-nav"><a href="./dashboard.html">Dashboard</a></nav>
+</div></header>
 
-<script>guardAdmin();</script>
-<div class="card">
-  <h3>Discounts</h3>
-  <div class="row">
-    <input id="code" class="input" placeholder="CODE">
-    <input id="desc" class="input" placeholder="Mô tả">
-    <select id="isPercent" class="input"><option value="1">%</option><option value="0">VND</option></select>
-    <input id="amount" class="input" placeholder="Giá trị">
-    <button class="btn" onclick="createD()">Tạo</button>
+<main class="container admin-container">
+<section class="panel">
+  <div class="panel-head"><h2 class="panel-title">Discounts</h2><button class="btn light" id="btnNew">+ Thêm</button></div>
+  <div class="toolbar"><input id="q" class="input" placeholder="Tìm code/desc"><button class="btn light" id="btnFilter">Lọc</button></div>
+  <table class="table">
+    <thead><tr><th>ID</th><th>Code</th><th>Kiểu</th><th>Giá trị</th><th>Hiệu lực</th><th>Actions</th></tr></thead>
+    <tbody id="rows"><tr><td colspan="6" class="muted">Đang tải…</td></tr></tbody>
+  </table>
+</section>
+</main>
+
+<div class="modal-backdrop" id="dlgWrap">
+  <div class="modal">
+    <div class="modal-head"><h3 class="modal-title" id="dlgTitle">Thêm mã</h3><button class="btn light small" id="dlgClose">Đóng</button></div>
+    <div class="form-grid">
+      <div><label>Code</label><input id="fCode" class="input"></div>
+      <div><label>Is Percent?</label><select id="fIsPercent" class="input"><option value="1">Percent</option><option value="0">Amount</option></select></div>
+      <div><label>Discount</label><input id="fAmount" type="number" class="input" min="0"></div>
+      <div><label>Bắt đầu</label><input id="fStart" type="date" class="input"></div>
+      <div><label>Kết thúc</label><input id="fEnd" type="date" class="input"></div>
+      <div style="grid-column:1/-1"><label>Mô tả</label><textarea id="fDesc" class="input"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn" id="dlgSave">Lưu</button></div>
   </div>
-  <table class="table"><thead><tr><th>ID</th><th>Code</th><th>Mô tả</th><th>Kiểu</th><th>Giá trị</th></tr></thead><tbody id="tb"></tbody></table>
-  <div id="pager"></div>
 </div>
-<script>
-let pageSize=10;
-async function loadD(page){
-  const res = await api(`/discounts?page=${page}&page_size=${pageSize}`, { auth:true });
-  const items = res?.data?.items || []; const meta = res?.data?.meta;
-  document.getElementById('tb').innerHTML = items.map(d=>`
-    <tr><td>${d.id}</td><td>${d.code}</td><td>${d.description||''}</td><td>${d.is_percent?'%':'VND'}</td><td>${d.discount_amount}</td></tr>
-  `).join('');
-  renderPager(meta, document.getElementById('pager'), (p)=> loadD(p));
-}
-async function createD(){
-  const code=document.getElementById('code').value.trim();
-  const description=document.getElementById('desc').value.trim();
-  const is_percent= parseInt(document.getElementById('isPercent').value);
-  const discount_amount= parseFloat(document.getElementById('amount').value||0);
-  if(!code || !discount_amount) return alert('Thiếu dữ liệu');
-  await api('/discounts',{ method:'POST', auth:true, body:{ code, description, is_percent, discount_amount } });
-  ['code','desc','amount'].forEach(id=>document.getElementById(id).value='');
-  loadD(1);
-}
-document.addEventListener('DOMContentLoaded', ()=> loadD(1));
-</script>
-</div><footer>© TourBooking FE • vanilla HTML/CSS/JS</footer></body></html>
+
+<footer class="site-footer">© TourBooking</footer>
+</body></html>
