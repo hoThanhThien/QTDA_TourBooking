@@ -9,11 +9,52 @@
   <script src="../../assets/js/api.js"></script>
   <script src="../../assets/js/util.js"></script>
   <script src="../../assets/js/admin-dashboard.js" defer></script>
+
+  <style>
+  /* ===== Sidebar UTH-like ===== */
+  .uth-bar{width:280px;background:#fff;border-right:1px solid #e5e7eb;
+    position:fixed;left:0;top:60px;bottom:0;z-index:20}
+  .with-sidebar{margin-left:280px}
+  .uth-head{display:flex;align-items:center;gap:10px;padding:10px 12px}
+  .uth-close{width:32px;height:32px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer}
+  .uth-close:hover{background:#f3f4f6}
+  .uth-nav{height:calc(100% - 52px);overflow:auto;padding:8px 6px 16px}
+  .uth-root{display:block;margin:6px 8px 10px;padding:10px 12px;border-radius:10px;
+    text-decoration:none;color:#0f172a;border:1px solid #e5e7eb;background:#fff}
+  .uth-active{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+
+  .uth-group{margin:8px 6px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+  .uth-group>summary{list-style:none;padding:10px 12px;border-radius:12px;cursor:pointer;
+    display:flex;align-items:center;gap:8px;font-weight:600}
+  .uth-group>summary::-webkit-details-marker{display:none}
+  .uth-group>summary:hover{background:#f8fafc}
+  .chev{transition:transform .15s ease}
+  .uth-group[open] .chev{transform:rotate(90deg)}
+
+  .uth-list{list-style:none;margin:0;padding:6px 0 10px}
+  .uth-list li{position:relative}
+  .uth-list a{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 36px;
+    margin:2px 6px;border-radius:10px;color:#0f172a;text-decoration:none}
+  .uth-list a:hover{background:#f3f4f6}
+  .uth-list li::before{content:"";position:absolute;left:16px;top:50%;
+    width:12px;height:12px;border-radius:50%;transform:translateY(-50%);
+    border:2px solid #9ca3af;background:#fff}
+  .uth-list li.is-done::before{background:#10b981;border-color:#10b981}
+
+  @media (max-width: 1024px){
+    .with-sidebar{margin-left:0}
+    .uth-bar{top:56px;transform:translateX(-100%);transition:transform .2s ease}
+    .uth-bar.open{transform:translateX(0)}
+  }
+  </style>
 </head>
 <body>
 <header class="site-header">
   <div class="hdr-wrap">
-    <div class="brand"><a href="../../index.html" class="brand-link">TourBooking</a><span class="brand-dot">•</span><span class="brand-sub">Admin</span></div>
+    <div class="brand">
+      <a href="../../index.html" class="brand-link">TourBooking</a>
+      <span class="brand-dot">•</span><span class="brand-sub">Admin</span>
+    </div>
     <nav class="hdr-nav">
       <a href="../../index.html">Home</a>
       <a href="../tours.html">Tours</a>
@@ -25,11 +66,46 @@
   </div>
 </header>
 
-<main class="container admin-container">
+<!-- Sidebar -->
+<aside id="sidebar" class="sb uth-bar">
+  <div class="uth-head">
+    <button class="uth-close" id="uthClose" aria-label="Toggle">✕</button>
+    <strong>Admin</strong>
+  </div>
+
+  <nav class="uth-nav">
+    <a class="uth-root" href="./dashboard.html">🏠 Dashboard</a>
+
+    <details class="uth-group" open>
+      <summary><span class="chev">▸</span> Quản trị nội dung</summary>
+      <ul class="uth-list">
+        <li class="is-done"><a href="./categories.html">📁 Categories</a></li>
+        <li><a href="./tours.html">🧭 Tours</a></li>
+        <li><a href="./photos.html">🖼️ Photos</a></li>
+      </ul>
+    </details>
+
+    <details class="uth-group">
+      <summary><span class="chev">▸</span> Bán hàng</summary>
+      <ul class="uth-list">
+        <li><a href="./discounts.html">🏷️ Discounts</a></li>
+        <li><a href="./bookings.html">🧾 Bookings</a></li>
+      </ul>
+    </details>
+
+    <details class="uth-group">
+      <summary><span class="chev">▸</span> Người dùng</summary>
+      <ul class="uth-list">
+        <li><a href="./users.html">👤 Users & Roles</a></li>
+      </ul>
+    </details>
+  </nav>
+</aside>
+
+<main class="container admin-container with-sidebar">
   <section class="dash-top">
     <div>
       <h1 class="dash-title">Bảng điều khiển</h1>
-      <div class="muted">API base: <b id="baseUrlHint"></b></div>
     </div>
     <div class="user-chip">
       <div class="u-dot"></div>
@@ -51,21 +127,6 @@
   </section>
 
   <section class="panel">
-    <div class="panel-head">
-      <h2 class="panel-title">Tác vụ nhanh</h2>
-      <button class="btn light small" id="btnRefresh">Làm mới</button>
-    </div>
-    <div class="quick-actions">
-      <a class="qa-btn" href="./categories.html"><div class="qa-ico">📁</div><div>Categories</div></a>
-      <a class="qa-btn" href="./tours.html"><div class="qa-ico">🧭</div><div>Tours</div></a>
-      <a class="qa-btn" href="./photos.html"><div class="qa-ico">🖼️</div><div>Photos</div></a>
-      <a class="qa-btn" href="./discounts.html"><div class="qa-ico">🏷️</div><div>Discounts</div></a>
-      <a class="qa-btn" href="./bookings.html"><div class="qa-ico">🧾</div><div>Bookings</div></a>
-      <a class="qa-btn" href="./users.html"><div class="qa-ico">👤</div><div>Users & Roles</div></a>
-    </div>
-  </section>
-
-  <section class="panel">
     <div class="panel-head"><h2 class="panel-title">Bookings gần đây</h2><a class="btn small" href="./bookings.html">Xem tất cả</a></div>
     <table class="table compact">
       <thead><tr><th>ID</th><th>User</th><th>Tour</th><th>People</th><th>Status</th><th>Total</th><th>Created</th></tr></thead>
@@ -80,5 +141,26 @@
 </main>
 
 <footer class="site-footer">© TourBooking • Admin</footer>
+<script src="../../assets/js/admin-shell.js" defer></script>
+
+<script>
+/* Toggle & active item */
+(function(){
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('uthClose');
+  const KEY='uth_sb_open';
+  function setOpen(v){ sb.classList.toggle('open',v); localStorage.setItem(KEY,v?'1':'0'); }
+  const initOpen = localStorage.getItem(KEY)==='1';
+  if(initOpen) sb.classList.add('open');
+  if(btn) btn.addEventListener('click',()=> setOpen(!sb.classList.contains('open')));
+  // highlight active
+  const here = location.pathname.split('/').pop();
+  document.querySelectorAll('.uth-list a,.uth-root').forEach(a=>{
+    const href = a.getAttribute('href')||'';
+    if(href && here && href.endsWith(here)) a.classList.add('uth-active');
+  });
+})();
+</script>
+
 </body>
 </html>

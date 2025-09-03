@@ -8,7 +8,8 @@ function jwt_sign($payload, $ttl=86400){
   global $config;
   $header = ['alg'=>'HS256','typ'=>'JWT'];
   $now = time();
-  $payload['iat']=$now; $payload['exp']=$now+$ttl;
+  $payload['iat']=$now;
+  $payload['exp']=$now+$ttl;
   $segments = [ base64url_encode(json_encode($header)), base64url_encode(json_encode($payload)) ];
   $sig = hash_hmac('sha256', implode('.',$segments), $config['jwt_secret'], true);
   $segments[] = base64url_encode($sig);
