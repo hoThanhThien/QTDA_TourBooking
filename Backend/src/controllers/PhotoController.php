@@ -1,29 +1,31 @@
 <?php
 function register_photo_routes(){
-  route('POST','/tours/{id}/photos', function($p){
-    $b=body(); required($b,['image_url']);
-    db()->prepare("INSERT INTO photos(tour_id,image_url,caption,is_primary) VALUES(?,?,?,?)")
-      ->execute([$p['id'],$b['image_url'],$b['caption']??null,$b['is_primary']??0]);
-    json_ok(['id'=>db()->lastInsertId()],'Created',201);
-  }, [require_role(['admin'])]);
-  route('PUT','/photos/{pid}', function($p){
-    $b=body(); db()->prepare("UPDATE photos SET image_url=?,caption=?,is_primary=? WHERE id=?")
-      ->execute([$b['image_url'],$b['caption']??null,$b['is_primary']??0,$p['pid']]);
-    json_ok(null,'Updated');
-  }, [require_role(['admin'])]);
-  route('DELETE','/photos/{pid}', function($p){
-    db()->prepare("DELETE FROM photos WHERE id=?")->execute([$p['pid']]); json_ok(null,'Deleted');
-  }, [require_role(['admin'])]);
-route('GET','/tours/{id}/photos', function($p){
-  $page=q_int('page',1); $pageSize=q_int('page_size',12);
-  $stc = db()->prepare("SELECT COUNT(*) c FROM photos WHERE tour_id=?");
-  $stc->execute([$p['id']]); $total=(int)$stc->fetch()['c'];
+  route('GET','/photos', function(){
+  $tourId   = q_int('tour_id', null);
+  $page     = q_int('page', 1);
+  $pageSize = max(1, min(100, q_int('page_size', 12)));
+  $offset   = ($page - 1) * $pageSize;
 
-  $offset = ($page-1)*$pageSize;
-  $st = db()->prepare("SELECT * FROM photos WHERE tour_id=? ORDER BY is_primary DESC, id DESC LIMIT $pageSize OFFSET $offset");
-  $st->execute([$p['id']]); $rows=$st->fetchAll();
+  $conds = []; $params = [];
+  if ($tourId !== null) { $conds[] = 'tour_id = ?'; $params[] = $tourId; }
+  $where = $conds ? ('WHERE ' . implode(' AND ', $conds)) : '';
 
-  json_ok(['items'=>$rows,'meta'=>meta_pagination($total,$page,$pageSize)]);
+  // Đếm tổng
+  $stc = db()->prepare("SELECT COUNT(*) c FROM photos $where");
+  $stc->execute($params);
+  $total = (int)($stc->fetch()['c'] ?? 0);
+
+  // Lấy trang
+  $sql = "SELECT id, tour_id, image_url, caption, is_primary
+          FROM photos $where
+          ORDER BY is_primary DESC, id DESC
+          LIMIT $pageSize OFFSET $offset";
+  $st = db()->prepare($sql);
+  $st->execute($params);
+  $rows = $st->fetchAll();
+
+  json_ok(['items'=>$rows, 'meta'=>meta_pagination($total,$page,$pageSize)]);
 });
+
 
 }

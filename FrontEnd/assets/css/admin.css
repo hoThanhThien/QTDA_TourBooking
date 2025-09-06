@@ -104,17 +104,7 @@ textarea{min-height:100px}
 .qa-btn:hover{background:#f8fafc}
 .qa-ico{font-size:20px}
 
-/* ========== Modal ========== */
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:20}
-.modal{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;min-width:320px;max-width:720px;box-shadow:var(--shadow)}
-.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.modal-title{margin:0;font-size:18px}
-.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-.modal.show{display:flex}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.form-grid{grid-template-columns:1fr}}
-
-/* ========== Footer ========== */
+/* ========== Forms ========== */
 .site-footer{padding:22px 16px;color:var(--muted);text-align:center}:root{
   --sb-w: 240px;
   --sb-bg:#0b1320;
@@ -142,3 +132,113 @@ textarea{min-height:100px}
   .sb-toggle{display:inline-block}
   .with-sidebar{margin-left:0}
 }
+/* ==== Admin Shell & Sidebar (UTH-like) ==== */
+:root{
+  --hdr-h: 60px; /* 56px trên mobile nếu muốn */
+  --sb-w: 280px;
+  --border:#e5e7eb;
+  --ink:#0f172a;
+  --ink-muted:#475569;
+  --brand:#0ea5e9;
+  --bg:#fff;
+  --bg-muted:#f8fafc;
+}
+
+/* Header giữ nguyên layout cũ của bạn */
+
+.sb.uth-bar{
+  width:var(--sb-w);
+  background:var(--bg);
+  border-right:1px solid var(--border);
+  position:fixed; left:0; top:var(--hdr-h); bottom:0; z-index:20;
+  will-change:transform;
+}
+.with-sidebar{ margin-left:var(--sb-w); }
+.uth-head{ display:flex; align-items:center; gap:10px; padding:10px 12px; }
+.uth-close{ width:36px; height:36px; border:1px solid var(--border); border-radius:10px; background:#fff; cursor:pointer }
+.uth-close:hover{ background:#f3f4f6 }
+
+.uth-nav{ height:calc(100% - 56px); overflow:auto; padding:8px 6px 16px }
+.uth-root{
+  display:block; margin:6px 8px 10px; padding:10px 12px; border-radius:12px;
+  text-decoration:none; color:var(--ink); border:1px solid var(--border); background:#fff; font-weight:600;
+}
+.uth-active{ background:var(--brand); color:#fff; border-color:var(--brand) }
+
+.uth-group{ margin:8px 6px; border:1px solid var(--border); border-radius:12px; background:#fff }
+.uth-group>summary{
+  list-style:none; padding:10px 12px; border-radius:12px; cursor:pointer;
+  display:flex; align-items:center; gap:8px; font-weight:600; color:var(--ink)
+}
+.uth-group>summary::-webkit-details-marker{ display:none }
+.uth-group>summary:hover{ background:var(--bg-muted) }
+.chev{ transition:transform .15s ease }
+.uth-group[open] .chev{ transform:rotate(90deg) }
+
+.uth-list{ list-style:none; margin:0; padding:6px 0 10px }
+.uth-list li{ position:relative }
+.uth-list a{
+  display:flex; align-items:center; gap:8px; padding:8px 12px 8px 36px;
+  margin:2px 6px; border-radius:10px; color:var(--ink); text-decoration:none
+}
+.uth-list a:hover{ background:#f3f4f6 }
+.uth-list li::before{
+  content:""; position:absolute; left:16px; top:50%; width:12px; height:12px; border-radius:50%;
+  transform:translateY(-50%); border:2px solid #9ca3af; background:#fff
+}
+.uth-list li.is-done::before{ background:#10b981; border-color:#10b981 }
+
+/* Overlay khi mở sidebar ở mobile */
+.uth-mask{
+  position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:19;
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+.uth-mask.on{ opacity:1; pointer-events:auto }
+
+/* Main content */
+.admin-container{ padding-top:16px; }
+
+/* Cards/grid responsive ví dụ cho dashboard */
+.stats-grid{
+  display:grid; gap:16px;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+@media (max-width: 1200px){
+  .stats-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 680px){
+  .stats-grid{ grid-template-columns:1fr; }
+}
+
+/* Off-canvas behavior dưới 1024px */
+@media (max-width: 1024px){
+  .with-sidebar{ margin-left:0 }
+  .sb.uth-bar{
+    transform:translateX(-100%); transition:transform .2s ease;
+    top:56px; /* nếu header mobile thấp hơn */
+  }
+  .sb.uth-bar.open{ transform:translateX(0) }
+}
+
+/* Nút menu trong header (ẩn desktop) */
+.btn-sb{
+  display:none; align-items:center; justify-content:center;
+  width:36px; height:36px; border:1px solid var(--border); border-radius:10px; background:#fff;
+  margin-right:8px; cursor:pointer;
+}
+.btn-sb:hover{ background:#f3f4f6 }
+@media (max-width: 1024px){ .btn-sb{ display:inline-flex } }
+.thumb{ width:72px; height:48px; object-fit:cover; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.badge{ display:inline-block; padding:3px 8px; border-radius:999px; font-size:12px; line-height:1; }
+.bg-success{ background:#10b981; color:#fff; }
+.bg-secondary{ background:#cbd5e1; color:#0f172a; }
+.bg-warn{ background:#f59e0b; color:#1f2937; }
+.error{ color:#b91c1c; }
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;place-items:center;z-index:60}
+.modal{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(2,6,23,.2);width:min(560px,92vw);padding:16px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.modal-title{margin:0;font-size:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.error{color:#b91c1c}

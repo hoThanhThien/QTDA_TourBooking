@@ -11,41 +11,116 @@
   <script src="../../assets/js/admin-dashboard.js" defer></script>
 
   <style>
-  /* ===== Sidebar UTH-like ===== */
-  .uth-bar{width:280px;background:#fff;border-right:1px solid #e5e7eb;
-    position:fixed;left:0;top:60px;bottom:0;z-index:20}
-  .with-sidebar{margin-left:280px}
-  .uth-head{display:flex;align-items:center;gap:10px;padding:10px 12px}
-  .uth-close{width:32px;height:32px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer}
-  .uth-close:hover{background:#f3f4f6}
-  .uth-nav{height:calc(100% - 52px);overflow:auto;padding:8px 6px 16px}
-  .uth-root{display:block;margin:6px 8px 10px;padding:10px 12px;border-radius:10px;
-    text-decoration:none;color:#0f172a;border:1px solid #e5e7eb;background:#fff}
-  .uth-active{background:#0ea5e9;color:#fff;border-color:#0ea5e9}
+/* ===== Pretty Admin Sidebar v2 ===== */
+:root{
+  --hdr-h:60px;
+  --sb-w:280px;
+  --ink:#0f172a;
+  --muted:#475569;
+  --border:#e5e7eb;
+  --bg:#fff;
+  --bg2:#fbfdff;
+  --brand:#0ea5e9;
+  --brand2:#22d3ee;
+  --ok:#10b981;
+  --glow: 0 12px 30px rgba(2,6,23,.06);
+}
 
-  .uth-group{margin:8px 6px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
-  .uth-group>summary{list-style:none;padding:10px 12px;border-radius:12px;cursor:pointer;
-    display:flex;align-items:center;gap:8px;font-weight:600}
-  .uth-group>summary::-webkit-details-marker{display:none}
-  .uth-group>summary:hover{background:#f8fafc}
-  .chev{transition:transform .15s ease}
-  .uth-group[open] .chev{transform:rotate(90deg)}
+/* Sidebar container */
+.sb.uth-bar{
+  width:var(--sb-w);
+  position:fixed; left:0; top:var(--hdr-h); bottom:0; z-index:20;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  border-right:1px solid var(--border);
+  border-radius:0 16px 16px 0;
+  box-shadow: 1px 0 0 var(--border), var(--glow);
+}
+.with-sidebar{ margin-left:var(--sb-w); }
 
-  .uth-list{list-style:none;margin:0;padding:6px 0 10px}
-  .uth-list li{position:relative}
-  .uth-list a{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 36px;
-    margin:2px 6px;border-radius:10px;color:#0f172a;text-decoration:none}
-  .uth-list a:hover{background:#f3f4f6}
-  .uth-list li::before{content:"";position:absolute;left:16px;top:50%;
-    width:12px;height:12px;border-radius:50%;transform:translateY(-50%);
-    border:2px solid #9ca3af;background:#fff}
-  .uth-list li.is-done::before{background:#10b981;border-color:#10b981}
+/* Header inside sidebar */
+.uth-head{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #eef2f7; }
+.uth-close{
+  width:36px; height:36px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer;
+  transition:background .15s ease, box-shadow .15s ease, transform .05s ease;
+}
+.uth-close:hover{ background:#f3f4f6 }
+.uth-close:active{ transform:scale(.98) }
+.uth-close:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(14,165,233,.35) }
 
-  @media (max-width: 1024px){
-    .with-sidebar{margin-left:0}
-    .uth-bar{top:56px;transform:translateX(-100%);transition:transform .2s ease}
-    .uth-bar.open{transform:translateX(0)}
-  }
+/* Nav groups */
+.uth-nav{ height:calc(100% - 60px); overflow:auto; padding:12px }
+.uth-root{
+  display:flex; align-items:center; gap:10px;
+  margin:8px 6px 12px; padding:12px 14px;
+  border:1px solid var(--border); border-radius:14px; background:#fff; color:var(--ink); font-weight:600;
+  text-decoration:none; box-shadow:0 1px 1px rgba(2,6,23,.03);
+  transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.uth-root:hover{ background:#f8fafc; border-color:#dbe2ea }
+
+.uth-group{
+  margin:10px 6px; border:1px solid var(--border); border-radius:14px; background:#fff;
+  box-shadow:0 2px 12px rgba(2,6,23,.04); overflow:hidden;
+}
+.uth-group>summary{
+  list-style:none; padding:12px 14px; cursor:pointer;
+  display:flex; align-items:center; gap:8px; font-weight:700; color:var(--ink);
+}
+.uth-group>summary::-webkit-details-marker{ display:none }
+.uth-group>summary:hover{ background:#f8fafc }
+.chev{ transition:transform .15s ease }
+.uth-group[open] .chev{ transform:rotate(90deg) }
+
+/* List items */
+.uth-list{ list-style:none; margin:0; padding:8px 0 12px }
+.uth-list li{ position:relative }
+.uth-list a{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px 9px 40px; margin:2px 6px; border-radius:12px;
+  color:var(--ink); text-decoration:none; transition:background .15s ease, box-shadow .15s ease;
+}
+.uth-list a:hover{ background:#f3f6fb }
+.uth-list a:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(14,165,233,.35) }
+
+/* Dots */
+.uth-list li::before{
+  content:""; position:absolute; left:16px; top:50%; transform:translateY(-50%);
+  width:12px; height:12px; border-radius:50%; border:2px solid #cbd5e1; background:#fff;
+}
+.uth-list li.is-done::before{ background:var(--ok); border-color:var(--ok) }
+
+/* Active highlight (root + item) */
+.uth-active{
+  background:linear-gradient(135deg, var(--brand) 0%, var(--brand2) 80%);
+  color:#fff !important; border-color:transparent !important; box-shadow:0 10px 30px rgba(14,165,233,.18);
+}
+.uth-root.uth-active{ border-color:transparent }
+.uth-list li:has(> a.uth-active)::before{ background:var(--brand); border-color:var(--brand) }
+
+/* Overlay + mobile off-canvas */
+.uth-mask{
+  position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:19;
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+.uth-mask.on{ opacity:1; pointer-events:auto }
+
+.btn-sb{
+  display:none; width:36px; height:36px; border:1px solid var(--border);
+  border-radius:10px; background:#fff; cursor:pointer;
+}
+.btn-sb:hover{ background:#f3f4f6 }
+
+@media (max-width:1024px){
+  .with-sidebar{ margin-left:0 }
+  .sb.uth-bar{ top:56px; transform:translateX(-100%); transition:transform .2s ease }
+  .sb.uth-bar.open{ transform:translateX(0) }
+  .btn-sb{ display:inline-flex; align-items:center; justify-content:center }
+}
+
+/* (Optional) bảng gọn gàng khi màn hình hẹp */
+.table.compact{ display:block; overflow:auto; border-radius:12px; }
+.table.compact table{ min-width:720px; width:100% }
+
   </style>
 </head>
 <body>
@@ -68,10 +143,7 @@
 
 <!-- Sidebar -->
 <aside id="sidebar" class="sb uth-bar">
-  <div class="uth-head">
-    <button class="uth-close" id="uthClose" aria-label="Toggle">✕</button>
-    <strong>Admin</strong>
-  </div>
+  
 
   <nav class="uth-nav">
     <a class="uth-root" href="./dashboard.html">🏠 Dashboard</a>

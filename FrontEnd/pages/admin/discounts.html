@@ -11,8 +11,152 @@
 <header class="site-header"><div class="hdr-wrap">
   <div class="brand"><a class="brand-link" href="../../index.html">TourBooking</a><span class="brand-dot">•</span><span class="brand-sub">Admin</span></div>
   <nav class="hdr-nav"><a href="./dashboard.html">Dashboard</a></nav>
-</div></header>
+</div>
+  <style>
+/* ===== Pretty Admin Sidebar v2 ===== */
+:root{
+  --hdr-h:60px;
+  --sb-w:280px;
+  --ink:#0f172a;
+  --muted:#475569;
+  --border:#e5e7eb;
+  --bg:#fff;
+  --bg2:#fbfdff;
+  --brand:#0ea5e9;
+  --brand2:#22d3ee;
+  --ok:#10b981;
+  --glow: 0 12px 30px rgba(2,6,23,.06);
+}
 
+/* Sidebar container */
+.sb.uth-bar{
+  width:var(--sb-w);
+  position:fixed; left:0; top:var(--hdr-h); bottom:0; z-index:20;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  border-right:1px solid var(--border);
+  border-radius:0 16px 16px 0;
+  box-shadow: 1px 0 0 var(--border), var(--glow);
+}
+.with-sidebar{ margin-left:var(--sb-w); }
+
+/* Header inside sidebar */
+.uth-head{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #eef2f7; }
+.uth-close{
+  width:36px; height:36px; border:1px solid var(--border); border-radius:12px; background:#fff; cursor:pointer;
+  transition:background .15s ease, box-shadow .15s ease, transform .05s ease;
+}
+.uth-close:hover{ background:#f3f4f6 }
+.uth-close:active{ transform:scale(.98) }
+.uth-close:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(14,165,233,.35) }
+
+/* Nav groups */
+.uth-nav{ height:calc(100% - 60px); overflow:auto; padding:12px }
+.uth-root{
+  display:flex; align-items:center; gap:10px;
+  margin:8px 6px 12px; padding:12px 14px;
+  border:1px solid var(--border); border-radius:14px; background:#fff; color:var(--ink); font-weight:600;
+  text-decoration:none; box-shadow:0 1px 1px rgba(2,6,23,.03);
+  transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.uth-root:hover{ background:#f8fafc; border-color:#dbe2ea }
+
+.uth-group{
+  margin:10px 6px; border:1px solid var(--border); border-radius:14px; background:#fff;
+  box-shadow:0 2px 12px rgba(2,6,23,.04); overflow:hidden;
+}
+.uth-group>summary{
+  list-style:none; padding:12px 14px; cursor:pointer;
+  display:flex; align-items:center; gap:8px; font-weight:700; color:var(--ink);
+}
+.uth-group>summary::-webkit-details-marker{ display:none }
+.uth-group>summary:hover{ background:#f8fafc }
+.chev{ transition:transform .15s ease }
+.uth-group[open] .chev{ transform:rotate(90deg) }
+
+/* List items */
+.uth-list{ list-style:none; margin:0; padding:8px 0 12px }
+.uth-list li{ position:relative }
+.uth-list a{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px 9px 40px; margin:2px 6px; border-radius:12px;
+  color:var(--ink); text-decoration:none; transition:background .15s ease, box-shadow .15s ease;
+}
+.uth-list a:hover{ background:#f3f6fb }
+.uth-list a:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(14,165,233,.35) }
+
+/* Dots */
+.uth-list li::before{
+  content:""; position:absolute; left:16px; top:50%; transform:translateY(-50%);
+  width:12px; height:12px; border-radius:50%; border:2px solid #cbd5e1; background:#fff;
+}
+.uth-list li.is-done::before{ background:var(--ok); border-color:var(--ok) }
+
+/* Active highlight (root + item) */
+.uth-active{
+  background:linear-gradient(135deg, var(--brand) 0%, var(--brand2) 80%);
+  color:#fff !important; border-color:transparent !important; box-shadow:0 10px 30px rgba(14,165,233,.18);
+}
+.uth-root.uth-active{ border-color:transparent }
+.uth-list li:has(> a.uth-active)::before{ background:var(--brand); border-color:var(--brand) }
+
+/* Overlay + mobile off-canvas */
+.uth-mask{
+  position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:19;
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+}
+.uth-mask.on{ opacity:1; pointer-events:auto }
+
+.btn-sb{
+  display:none; width:36px; height:36px; border:1px solid var(--border);
+  border-radius:10px; background:#fff; cursor:pointer;
+}
+.btn-sb:hover{ background:#f3f4f6 }
+
+@media (max-width:1024px){
+  .with-sidebar{ margin-left:0 }
+  .sb.uth-bar{ top:56px; transform:translateX(-100%); transition:transform .2s ease }
+  .sb.uth-bar.open{ transform:translateX(0) }
+  .btn-sb{ display:inline-flex; align-items:center; justify-content:center }
+}
+
+/* (Optional) bảng gọn gàng khi màn hình hẹp */
+.table.compact{ display:block; overflow:auto; border-radius:12px; }
+.table.compact table{ min-width:720px; width:100% }
+
+  </style>
+</header>
+<!-- Sidebar -->
+<aside id="sidebar" class="sb uth-bar">
+  
+
+  <nav class="uth-nav">
+    <a class="uth-root" href="./dashboard.html">🏠 Dashboard</a>
+
+    <details class="uth-group" open>
+      <summary><span class="chev">▸</span> Quản trị nội dung</summary>
+      <ul class="uth-list">
+        <li class="is-done"><a href="./categories.html">📁 Categories</a></li>
+        <li><a href="./tours.html">🧭 Tours</a></li>
+        <li><a href="./photos.html">🖼️ Photos</a></li>
+      </ul>
+    </details>
+
+    <details class="uth-group">
+      <summary><span class="chev">▸</span> Bán hàng</summary>
+      <ul class="uth-list">
+        <li><a href="./discounts.html">🏷️ Discounts</a></li>
+        <li><a href="./bookings.html">🧾 Bookings</a></li>
+      </ul>
+    </details>
+
+    <details class="uth-group">
+      <summary><span class="chev">▸</span> Người dùng</summary>
+      <ul class="uth-list">
+        <li><a href="./users.html">👤 Users & Roles</a></li>
+      </ul>
+    </details>
+  </nav>
+</aside>
 <main class="container admin-container">
 <section class="panel">
   <div class="panel-head"><h2 class="panel-title">Discounts</h2><button class="btn light" id="btnNew">+ Thêm</button></div>

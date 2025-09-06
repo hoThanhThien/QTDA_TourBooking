@@ -1,43 +1,109 @@
-<!doctype html><html lang="vi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin • Categories</title>
-<link rel="stylesheet" href="../../assets/css/style.css">
-<link rel="stylesheet" href="../../assets/css/admin.css">
-<script src="../../assets/js/config.js"></script><script src="../../assets/js/api.js"></script><script src="../../assets/js/util.js"></script>
-<script src="../../assets/js/admin-categories.js" defer></script>
-</head><body>
-<header class="site-header"><div class="hdr-wrap">
-  <div class="brand"><a class="brand-link" href="../../index.html">TourBooking</a><span class="brand-dot">•</span><span class="brand-sub">Admin</span></div>
-  <nav class="hdr-nav"><a href="./dashboard.html">Dashboard</a></nav>
-</div></header>
-
-<main class="container admin-container">
-<section class="panel">
-  <div class="panel-head"><h2 class="panel-title">Categories</h2><button class="btn light" id="btnNew">+ Thêm</button></div>
-  <div class="toolbar">
-    <input id="q" class="input" placeholder="Tìm theo tên…">
-    <select id="pageSize"><option>10</option><option>20</option><option>50</option></select>
-    <button class="btn light" id="btnFilter">Lọc</button>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin • Categories</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <script src="../../assets/js/config.js"></script>
+  <style>
+    /* modal tối thiểu (phòng khi admin.css chưa có) */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;place-items:center;z-index:9999}
+    .modal{background:#fff;width:min(560px,92vw);border-radius:16px;box-shadow:0 20px 60px rgba(2,6,23,.2);padding:16px}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .form-grid{display:grid;gap:12px}
+    .modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+  </style>
+  <!-- CHỈ MỘT file JS -->
+  <script src="../../assets/js/admin-categories.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="hdr-wrap">
+    <div class="brand">
+      <a class="brand-link" href="../../index.html">TourBooking</a>
+      <span class="brand-dot">•</span><span class="brand-sub">Admin</span>
+    </div>
+    <nav class="hdr-nav"><a href="./dashboard.html">Dashboard</a></nav>
   </div>
-  <table class="table">
-    <thead><tr><th>ID</th><th>Tên</th><th>Mô tả</th><th>Actions</th></tr></thead>
-    <tbody id="rows"><tr><td colspan="4" class="muted">Đang tải…</td></tr></tbody>
-  </table>
-  <div class="pager"><span class="muted" id="meta"></span><div style="margin-left:auto"><button class="btn light small" id="prev">Prev</button><button class="btn light small" id="next">Next</button></div></div>
-</section>
+</header>
+
+<aside class="sb uth-bar">
+  <nav class="uth-nav">
+    <a class="uth-root" href="./dashboard.html">🏠 Dashboard</a>
+    <details class="uth-group" open>
+      <summary><span class="chev">▸</span> Quản trị nội dung</summary>
+      <ul class="uth-list">
+        <li class="is-done"><a class="uth-active" href="./categories.html">📁 Categories</a></li>
+        <li><a href="./tours.html">🧭 Tours</a></li>
+        <li><a href="./photos.html">🖼️ Photos</a></li>
+      </ul>
+    </details>
+    <details class="uth-group">
+      <summary><span class="chev">▸</span> Bán hàng</summary>
+      <ul class="uth-list">
+        <li><a href="./discounts.html">🏷️ Discounts</a></li>
+        <li><a href="./bookings.html">🧾 Bookings</a></li>
+      </ul>
+    </details>
+    <details class="uth-group">
+      <summary><span class="chev">▸</span> Người dùng</summary>
+      <ul class="uth-list"><li><a href="./users.html">👤 Users & Roles</a></li></ul>
+    </details>
+  </nav>
+</aside>
+
+<main class="container admin-container with-sidebar">
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">Categories</h2>
+      <button class="btn light" id="btnNew" type="button">+ Thêm</button>
+    </div>
+
+    <div class="toolbar">
+      <input id="q" class="input" placeholder="Tìm theo tên…">
+      <select id="pageSize"><option>10</option><option>20</option><option>50</option></select>
+      <button class="btn light" id="btnFilter" type="button">Lọc</button>
+    </div>
+
+    <table class="table">
+      <thead><tr><th>ID</th><th>Tên</th><th>Mô tả</th><th>Actions</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="4" class="muted">Đang tải…</td></tr></tbody>
+    </table>
+
+    <div class="pager">
+      <span class="muted" id="meta"></span>
+      <div style="margin-left:auto">
+        <button class="btn light small" id="prev" type="button">Prev</button>
+        <button class="btn light small" id="next" type="button">Next</button>
+      </div>
+    </div>
+  </section>
 </main>
 
 <!-- Modal -->
-<div class="modal-backdrop" id="dlgWrap">
+<div class="modal-backdrop" id="dlgWrap" style="display:none">
   <div class="modal">
-    <div class="modal-head"><h3 class="modal-title" id="dlgTitle">Thêm category</h3><button class="btn light small" id="dlgClose">Đóng</button></div>
-    <div class="form-grid">
-      <div style="grid-column:1/-1"><label>Tên</label><input id="fName" class="input" placeholder="Biển đảo"></div>
-      <div style="grid-column:1/-1"><label>Mô tả</label><textarea id="fDesc" class="input" placeholder="…"></textarea></div>
+    <div class="modal-head">
+      <h3 class="modal-title" id="dlgTitle">Thêm Category</h3>
+      <button class="btn light small" id="dlgClose" type="button">Đóng</button>
     </div>
-    <div class="modal-foot"><button class="btn" id="dlgSave">Lưu</button></div>
+    <div class="form-grid">
+      <div style="grid-column:1/-1">
+        <label>Tên</label>
+        <input id="fName" class="input" placeholder="Tên category">
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Mô tả</label>
+        <input id="fDesc" class="input" placeholder="Mô tả (tuỳ chọn)">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="dlgSave" type="button">Lưu</button>
+    </div>
   </div>
 </div>
 
 <footer class="site-footer">© TourBooking</footer>
-</body></html>
+</body>
+</html>
